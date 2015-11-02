@@ -41,14 +41,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     chartId: {
                         type: String,
                         value: 'chart2'
+                    },
+                    data: {
+                        value: this.stream_layers(5, 128, .1).map((data, i) => {
+                            return {
+                                key: 'Stream' + i, // Training Class
+                                values: data, // Value
+                                name: "Cell"
+                            };
+                        })
                     }
                 };
             }
 
             created() {}
             ready() {
-
                 this.render()
+                //console.log(this.stream_layers(3,10,0.1).map((data, i) => {return {key: 'Hi' + i, values: data}}))
             }
             attached() {}
             detached() {}
@@ -84,13 +93,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             // NVD3 MultiBar Chart
             render() {
                 //var test_data = stream_layers(3,128,.1).map(function(data, i) {
-                var test_data = this.stream_layers(5, 128, .1).map(function(data, i) {
-                    return {
-                        key: 'Stream' + i, // Training Class
-                        values: data, // Value
-                        name: "Cell"
-                    };
-                });
+                // var test_data = this.stream_layers(5, 128, .1).map(function(data, i) {
+                //     return {
+                //         key: 'Stream' + i, // Training Class
+                //         values: data, // Value
+                //         name: "Cell"
+                //     };
+                // });
 
                 // Reference for NVD3
                 var self = this;
@@ -115,7 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             console.log('Render Complete');
                         });
                         var svg = d3.select('#' + self.chartId + ' svg')
-                            .datum(test_data);
+                            .datum(self.data);
 
 
                         console.log('calling chart');
