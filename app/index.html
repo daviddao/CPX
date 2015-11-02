@@ -1,12 +1,7 @@
 <!doctype html>
 <!--
 @license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+David Dao, Broad Institute
 -->
 <html lang="">
 
@@ -15,7 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Polymer Starter Kit" />
-    <title>CellProfiler Classifier</title>
+    <title>CellProfiler [X]</title>
     <!-- Place favicon.ico in the `app/` directory -->
     <!-- Chrome for Android theme color -->
     <meta name="theme-color" content="#2E3AA1">
@@ -55,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-scroll-header-panel drawer fixed>
                 <!-- Drawer Toolbar -->
                 <paper-toolbar id="drawerToolbar" class="tall">
-                    <span class="paper-font-title bottom"><img src="images/CP.png" width="50px" align="left"/>CellProfiler<br>Classifier</span>
+                    <span class="paper-font-title bottom"><img src="images/CP.png" width="50px" align="left"/>CellProfiler <br>[X]</span>
                 </paper-toolbar>
                 <!-- Drawer Content -->
                 <paper-menu class="list" attr-for-selected="data-route" selected="[[route]]">
@@ -85,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <span class="flex"></span>
                     <!-- Toolbar icons -->
                     <paper-icon-button icon="dashboard" class="bottom"></paper-icon-button>
-                    <span class="bottom indent title">Classifier Dashboard</span>
+                    <span class="bottom indent title">[X] Dashboard</span>
                     <paper-icon-button class="bottom" src="images/broad.png"></paper-icon-button>
                     <!-- Logo -->
                     <span class="bottom" style="font-size:12px">
@@ -116,6 +111,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     <paper-button raised onclick="submitForm()">Submit Job</paper-button>
                                 </p>
                             </paper-material>
+
+                            <paper-material elevation="1">
+                                <polybio-hist chart-id="chart1"></polybio-hist>
+                                <a href="">More details</a>
+                            </paper-material>
+                            <paper-material elevation="1">
+                                <polybio-hist chart-id="chart2"></polybio-hist>
+                                 <a href="">More details</a>
+                            </paper-material>
+                            <paper-material elevation="1">
+                                <polybio-hist chart-id="chart3"></polybio-hist>
+                                 <a href="">More details</a>
+                            </paper-material>
+                            <paper-material elevation="1">
+                                <polybio-hist chart-id="chart4"></polybio-hist>
+                                 <a href="">More details</a>
+                            </paper-material>
+                             
 
                         </section>
                         <section data-route="users">

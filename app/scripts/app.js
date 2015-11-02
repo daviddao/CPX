@@ -31,6 +31,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
     // imports are loaded and elements have been registered
+     var drawerPanel = document.querySelector('#paperDrawerPanel');
+     drawerPanel.responsiveWidth = "1200px"
   });
 
   // Close drawer after menu item is selected if drawerPanel is narrow
