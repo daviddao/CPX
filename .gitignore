@@ -1,4 +1,8 @@
 node_modules
 dist
 bower_components
+.DS_Store
+.editorconfig
+.jscsrc
+.jshintrc
 .tmp
