@@ -54,41 +54,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             _render: function(values) {
 
-
-                var stream_layers = function(n, m, o) {
-                    if (arguments.length < 3) o = 0;
-
-                    function bump(a) {
-                        var x = 1 / (.1 + Math.random()),
-                            y = 2 * Math.random() - .5,
-                            z = 10 / (.1 + Math.random());
-                        for (var i = 0; i < m; i++) {
-                            var w = (i / m - y) * z;
-                            a[i] += x * Math.exp(-w * w);
-                        }
-                    }
-                    return d3.range(n).map(function() {
-                        var a = [],
-                            i;
-                        for (i = 0; i < m; i++) a[i] = o + o * Math.random();
-                        for (i = 0; i < 5; i++) bump(a);
-                        return a.map((d, i) => {
-                            return {
-                                x: i,
-                                y: Math.max(0, d)
-                            }
-                        });
-                    });
-                }
-
-                var test_data = stream_layers(5, 128, .1).map(function(data, i) {
-                    return {
-                        key: 'Stream' + i, // Training Class
-                        values: data, // Value
-                        name: "Cell"
-                    };
-                });
-
                 var hist = d3.layout.histogram();
                 hist.frequency(false); // Turn on probability
 
@@ -97,11 +62,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     key: '',
                     values: []
                 };
-                data["key"] = "test";
+                data["key"] = "Feature";
                 // Convert to nvd3 json format
                 for (var i = 0; i < hist_values.length; i++) {
                     data["values"].push({
-                        x: hist_values[i].x,
+                        x: (hist_values[i].x).toFixed(2),
                         y: hist_values[i].y
                     });
                 }
@@ -120,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         // });
 
                         chart.yAxis
-                            .axisLabel(self.$.distHistogram)
+                            .axisLabel("Probability")
                             .axisLabelDistance(-5)
                             .tickFormat(d3.format(',.01f'));
 
@@ -145,7 +110,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 // Test if its an array
                 if (Object.prototype.toString.call(data) === '[object Array]') {
                     res = data.map(function(d) {
-                        return parseFloat(d[0])
+                        return parseFloat(d[0]);
                     });
                 }
                 return res;

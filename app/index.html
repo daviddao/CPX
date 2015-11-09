@@ -88,7 +88,7 @@ David Dao, Broad Institute
                 </paper-toolbar> -->
                 <!-- Main Content -->
                 <!-- Data Processing Pipeline -->
-                <bio-data-csv id="bio-data-csv" csv-url="{{csvUrl}}" json-data="{{json}}"></bio-data-csv>
+                <bio-data-csv id="bio-data-csv" csv-url="{{csvUrl}}" csv-data="{{csvData}}" json-data="{{json}}"></bio-data-csv>
                 <bio-data-feature id="bio-data-feature" json-data="{{json}}" feature-data="{{feature}}"></bio-data-feature>
                 <div class="content">
                     <iron-pages attr-for-selected="data-route" selected="{{route}}">
@@ -105,6 +105,7 @@ David Dao, Broad Institute
                             <paper-material id="feature-inspector" elevation="1">
                                 <h2>{{feature.title}}</h2>
                                 <bio-data-stats feature-data="{{feature.values}}"></bio-data-stats>
+                                <bio-data-group id="groupByKey" csv-data="{{csvData}}"></bio-data-group>
                                 <bio-vis-hist id="histogram" feature-data="{{feature.values}}"></bio-vis-hist>
                             </paper-material>
                         </section>
