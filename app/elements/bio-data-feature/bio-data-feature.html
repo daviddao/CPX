@@ -30,16 +30,16 @@
           notify: true
         }
       },
-      extractFeatureData: function(selectedIndices, data) {
+      extractFeatureData: function(selectedIndices) {
         var indices = selectedIndices; // selected indices in form [from_row, from_cl, to_row, to_cl]
-        var tmp_data = data; //copy data
-        var headers = this.jsonData[0]; // Split data into header and values
+        var values = this.jsonData.slice(); //copy data
+        var headers = values.shift(); // Split data into header and values
         // Set some stuff
         var columnIdx = indices[1];
         var rowStart = Math.min(indices[0], indices[2]);
         var rowEnd = Math.max(indices[0], indices[2]);
         this._updateTitle(headers[columnIdx]);
-        var columnData = this._filterColumn(tmp_data, columnIdx, rowStart, rowEnd);
+        var columnData = this._filterColumn(values, columnIdx, rowStart, rowEnd);
         this._updateValues(columnData);
       },
       // Private method to filter for a column

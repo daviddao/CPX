@@ -49,7 +49,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 colHeaders: data.header,
                 rowHeaders: true,
                 stretchH: 'all',
-                columnSorting: true,
+                columnSorting: false, //not working correctly, also its too slow for 50000+ datasets
                 readOnly: true
             });
 
@@ -65,8 +65,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         if (key === 'inspect') {
                             var featureInspector = document.getElementById('bio-data-feature');
                             var selection = hot.getSelected();
-                            var sortedData = hot.getData(0, 0, hot.countRows() - 1, hot.countCols() - 1); //a bit hacky to get the sorted data
-                            featureInspector.extractFeatureData(selection, sortedData); // Call the featureInspector
+                            //var sortedData = hot.getData(0, 0, hot.countRows() - 1, hot.countCols() - 1); //a bit hacky to get the sorted data
+                            //featureInspector.extractFeatureData(selection, sortedData); // Call the featureInspector
+                            featureInspector.extractFeatureData(selection);
                         }
                     },
                     items: {
