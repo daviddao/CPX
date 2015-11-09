@@ -17,15 +17,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         </style>
         <div>
-        <h3>Summary Statistics</h3>
-        <ul>
-          <li>count: <span>{{count}}</span></li>
-          <li>mean: <span>{{mean}}</span></li>
-          <li>median: <span>{{median}}</span></li>
-          <li>deviation: <span>{{deviation}}</span></li>
-          <li>min: <span>{{min}}</span></li>
-          <li>max: <span>{{max}}</span></li>
-        </ul>
+            <h3>Summary Statistics</h3>
+            <ul>
+                <li>count: <span>{{count}}</span></li>
+                <li>mean: <span>{{mean}}</span></li>
+                <li>median: <span>{{median}}</span></li>
+                <li>deviation: <span>{{deviation}}</span></li>
+                <li>min: <span>{{min}}</span></li>
+                <li>max: <span>{{max}}</span></li>
+            </ul>
         </div>
     </template>
     <script>
@@ -42,9 +42,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     notify: true
                 },
                 count: {
-                  type: Number,
-                  notify: true,
-                  computed: 'computeCount(featureData)'
+                    type: Number,
+                    notify: true,
+                    computed: 'computeCount(featureData)'
                 },
                 mean: {
                     type: Number,
@@ -73,32 +73,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
             computeCount: function(column) {
-                if(column !== undefined)
-                  return column.length;
+                if (column !== undefined)
+                    return column.length;
             },
             computeMean: function(column) {
                 return d3.mean(column, function(d) {
-                  return d[0];
+                    return parseInt(d[0]);
                 })
             },
             computeMedian: function(column) {
                 return d3.median(column, function(d) {
-                  return d[0];
+                    return parseInt(d[0]);
                 })
             },
             computeDeviation: function(column) {
                 return d3.deviation(column, function(d) {
-                  return d[0];
+                    return parseInt(d[0]);
                 })
             },
             computeMin: function(column) {
                 return d3.min(column, function(d) {
-                  return d[0];
+                    return parseInt(d[0]);
                 })
             },
             computeMax: function(column) {
                 return d3.max(column, function(d) {
-                  return d[0];
+                    console.log(d);
+                    return parseInt(d[0]);
                 })
             }
         });
