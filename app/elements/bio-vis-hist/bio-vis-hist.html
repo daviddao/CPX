@@ -8,38 +8,28 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-material/paper-material.html">
-<link rel="import" href="../polybio-hist/polybio-hist.html">
-<dom-module id="polybio-data">
+<!-- Dependencies -->
+
+<dom-module id="bio-vis-hist">
     <template>
         <style>
         :host {
             display: block;
         }
         </style>
-        <template is="dom-repeat" items="{{data}}">
-            <paper-material elevation="1">
-                <polybio-hist chart-id="{{item}}"></polybio-hist>
-            </paper-material>
-        </template>
+
     </template>
     <script>
     (function() {
         'use strict';
 
         Polymer({
-            is: 'polybio-data',
+            is: 'bio-vis-hist',
 
             properties: {
-                data: {
-                    type: Array,
-                    value: () => {
-                        var a = [];
-                        for (var i = 0; i < 10; i++) {
-                            a.push("chart" + i);
-                        }
-                        return a
-                    },
+                foo: {
+                    type: String,
+                    value: 'bio-vis-hist',
                     notify: true
                 }
             }

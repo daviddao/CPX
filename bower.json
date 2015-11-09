@@ -8,8 +8,9 @@
     "platinum-elements": "PolymerElements/platinum-elements#^1.1.0",
     "neon-elements": "PolymerElements/neon-elements#^1.0.0",
     "page": "visionmedia/page.js#~1.6.3",
-    "sortable": "~0.8.0",
-    "Sortable": "~1.4.1"
+    "handsontable": "~0.20.0",
+    "comma-separated-values": "~3.6.4",
+    "lodash": "~3.10.1"
   },
   "devDependencies": {
     "web-component-tester": "*",

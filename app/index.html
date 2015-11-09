@@ -10,7 +10,7 @@ David Dao, Broad Institute
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Polymer Starter Kit" />
-    <title>CellProfiler [X]</title>
+    <title>Luminosity</title>
     <!-- Place favicon.ico in the `app/` directory -->
     <!-- Chrome for Android theme color -->
     <meta name="theme-color" content="#2E3AA1">
@@ -42,8 +42,6 @@ David Dao, Broad Institute
     <style is="custom-style" include="shared-styles"></style>
     <!-- Global dependencies for graphs -->
     <script src="//d3js.org/d3.v3.min.js"></script>
-    <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css">
 </head>
 
 <body unresolved class="fullbleed layout vertical">
@@ -54,7 +52,7 @@ David Dao, Broad Institute
             <paper-scroll-header-panel drawer fixed>
                 <!-- Drawer Toolbar -->
                 <paper-toolbar id="drawerToolbar" class="tall">
-                    <span class="paper-font-title bottom"><img src="images/CP.png" width="50px" align="left"/>CellProfiler <br>[X]</span>
+                    <span class="paper-font-title bottom"><img src="images/CP.png" width="50px" align="left"/>CellProfiler <br>Luminosity</span>
                 </paper-toolbar>
                 <!-- Drawer Content -->
                 <paper-menu class="list" attr-for-selected="data-route" selected="[[route]]">
@@ -79,26 +77,35 @@ David Dao, Broad Institute
             <!-- Main Area -->
             <paper-scroll-header-panel main condenses keep-condensed-header>
                 <!-- Main Toolbar -->
-                <paper-toolbar id="mainToolbar" class="tall">
+                <!-- <paper-toolbar id="mainToolbar" class="tall">
                     <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
                     <span class="flex"></span>
-                    <!-- Toolbar icons -->
-                    <paper-icon-button icon="dashboard" class="bottom"></paper-icon-button>
-                    <span class="bottom indent title">[X] Dashboard</span>
+                    <span class="bottom indent title"> Luminosity</span>
                     <paper-icon-button class="bottom" src="images/broad.png"></paper-icon-button>
-                    <!-- Logo -->
                     <span class="bottom" style="font-size:12px">
-          <span>by Imaging Platform</span>
+                    <span>by Imaging Platform</span>
                     <br> <span style="font-size:10px">Broad Institute</span>
                     </span>
-                </paper-toolbar>
+                </paper-toolbar> -->
                 <!-- Main Content -->
+                <!-- Data Processing Pipeline -->
+                <bio-data-csv id="bio-data-csv" csv-url="{{csvUrl}}" json-data="{{json}}"></bio-data-csv>
+                <bio-data-feature id="bio-data-feature" json-data="{{json}}" feature-data="{{feature}}"></bio-data-feature>
                 <div class="content">
                     <iron-pages attr-for-selected="data-route" selected="{{route}}">
                         <section data-route="home">
                             <paper-material elevation="1">
-                                <h2 class="page-title"><span>Getting started</span></h2>
-                                
+                                <paper-input value="{{csvUrl::change}}" required auto-validate error-message="input required" label="Url to CSV File">
+                                    <iron-icon icon="search" prefix></iron-icon>
+                                </paper-input>
+                            </paper-material>
+                            <paper-material animated elevation="1">
+                                <h2>{{csvUrl}}</h2>
+                                <div id="table"></div>
+                            </paper-material>
+                            <paper-material id="feature-inspector" elevation="1">
+                                <h2>{{feature.title}}</h2>
+                                <bio-data-stats feature-data="{{feature.values}}"></bio-data-stats>
                             </paper-material>
                         </section>
                         <section data-route="feature-explorer">
@@ -116,16 +123,9 @@ David Dao, Broad Institute
                                     <paper-button raised onclick="submitForm()">Submit Data</paper-button>
                                 </p>
                             </paper-material>
-                            <paper-material elevation="1">
-                                <polybio-hist chart-id="chart1"></polybio-hist>
-                                <a href="">More details</a>
-                            </paper-material>
                             <!-- Data Binding Example -->
-                            <paper-material elevation="1">
-                                <polybio-data data="{{test}}"></polybio-data>
-                                <polybio-hist chart-id="chart2" data="{{test}}"></polybio-hist>
-                                <a href="">More details</a>
-                            </paper-material>
+                            <!-- <polybio-data data="{{test}}"></polybio-data>
+                            
                             <paper-material elevation="1">
                                 <polybio-hist chart-id="chart3"></polybio-hist>
                                 <a href="">More details</a>
@@ -133,7 +133,7 @@ David Dao, Broad Institute
                             <paper-material elevation="1">
                                 <polybio-hist chart-id="chart4"></polybio-hist>
                                 <a href="">More details</a>
-                            </paper-material>
+                            </paper-material> -->
                         </section>
                         <section data-route="model-validation">
                             <paper-material elevation="1">
@@ -150,7 +150,9 @@ David Dao, Broad Institute
                                     <paper-button raised onclick="submitForm()">Submit Data</paper-button>
                                 </p>
                             </paper-material>
-
+                            <paper-material>
+                                <polybio-roc></polybio-roc>
+                            </paper-material>
                             <paper-material elevation="1">
                                 <img-box></img-box>
                             </paper-material>

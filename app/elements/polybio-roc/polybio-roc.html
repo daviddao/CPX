@@ -1,0 +1,279 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<dom-module id="polybio-roc">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        </style>
+        <div id="{{chartId}}" style="height:500px">
+            <svg></svg>
+        </div>
+    </template>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css">
+    <script>
+    (function() {
+        'use strict';
+
+        class LinePolymer {
+            beforeRegister() {
+                this.is = 'polybio-roc';
+                this.properties = {
+                    chartId: {
+                        type: String,
+                        value: 'line2'
+                    },
+                    data: {
+                        value: this.sinAndCos()
+                    }
+                };
+            }
+
+            created() {}
+            ready() {
+                this.render()
+            }
+            attached() {}
+            detached() {}
+            attributeChanged() {}
+
+            // Test Generator
+            sinAndCos() {
+
+                var tpr = {
+
+                    0: [0.11111111, 0.22222222, 0.33333333, 0.44444444, 0.44444444,
+                        0.55555556, 0.55555556, 0.55555556, 0.66666667, 0.77777778,
+                        0.77777778, 0.88888889, 1., 1., 1.,
+                        1., 1., 1.
+                    ],
+                    1: [0.11111111, 0.22222222, 0.33333333, 0.44444444, 0.44444444,
+                        0.44444444, 0.44444444, 0.55555556, 0.66666667, 0.77777778,
+                        0.77777778, 0.88888889, 0.88888889, 0.88888889, 0.88888889,
+                        0.88888889, 1., 1.
+                    ],
+                    2: [0.125, 0.125, 0.25, 0.375, 0.5, 0.5, 0.625, 0.625,
+                        0.75, 0.75, 0.875, 1., 1., 1., 1., 1.
+                    ],
+                    3: [0.125, 0.25, 0.375, 0.5, 0.5, 0.625, 0.625, 0.625,
+                        0.625, 0.625, 0.75, 0.875, 0.875, 1., 1., 1.
+                    ],
+                    4: [0.125, 0.25, 0.375, 0.5, 0.625, 0.625, 0.625, 0.625,
+                        0.75, 0.875, 0.875, 0.875, 0.875, 0.875, 1., 1.
+                    ],
+                    5: [0., 0., 0.125, 0.25, 0.375, 0.5, 0.625, 0.75,
+                        0.875, 1., 1., 1., 1., 1., 1., 1., 1.
+                    ],
+                    6: [0., 0.35648148, 0.35648148, 0.35648148, 0.35648148,
+                        0.35648148, 0.35648148, 0.35648148, 0.35648148, 0.35648148,
+                        0.35648148, 0.375, 0.375, 0.625, 0.625,
+                        0.625, 0.625, 0.625, 0.625, 0.625,
+                        0.625, 0.625, 0.625, 0.625, 0.625,
+                        0.64583333, 0.64583333, 0.64583333, 0.64583333, 0.64583333,
+                        0.64583333, 0.64583333, 0.64583333, 0.73842593, 0.73842593,
+                        0.73842593, 0.73842593, 0.73842593, 0.80092593, 0.80092593,
+                        0.80092593, 0.80092593, 0.80092593, 0.80092593, 0.85648148,
+                        0.85648148, 0.85648148, 0.85648148, 0.85648148, 0.85648148,
+                        0.89814815, 0.89814815, 0.89814815, 0.89814815, 0.89814815,
+                        0.89814815, 0.89814815, 0.89814815, 0.89814815, 0.89814815,
+                        0.89814815, 0.89814815, 0.93981481, 0.93981481, 0.93981481,
+                        0.93981481, 0.93981481, 0.93981481, 0.93981481, 0.93981481,
+                        0.93981481, 0.93981481, 0.93981481, 0.93981481, 0.93981481,
+                        0.96064815, 0.96064815, 0.96064815, 0.96064815, 0.96064815,
+                        0.96064815, 0.96064815, 0.96064815, 0.96064815, 0.96064815,
+                        0.96064815, 0.96064815, 0.98148148, 1., 1.,
+                        1., 1., 1., 1., 1.,
+                        1., 1., 1., 1., 1.
+                    ]
+
+                }
+
+                var fpr = {
+                    0: [0., 0., 0., 0., 0.11111111,
+                        0.11111111, 0.22222222, 0.33333333, 0.33333333, 0.33333333,
+                        0.44444444, 0.44444444, 0.44444444, 0.55555556, 0.66666667,
+                        0.77777778, 0.88888889, 1.
+                    ],
+                    1: [0., 0., 0., 0., 0.11111111,
+                        0.22222222, 0.33333333, 0.33333333, 0.33333333, 0.33333333,
+                        0.44444444, 0.44444444, 0.55555556, 0.66666667, 0.77777778,
+                        0.88888889, 0.88888889, 1.
+                    ],
+                    2: [0., 0.125, 0.125, 0.125, 0.125, 0.25, 0.25, 0.375,
+                        0.375, 0.5, 0.5, 0.5, 0.625, 0.75, 0.875, 1.
+                    ],
+                    3: [0., 0., 0., 0., 0.125, 0.125, 0.25, 0.375,
+                        0.5, 0.625, 0.625, 0.625, 0.75, 0.75, 0.875, 1.
+                    ],
+                    4: [0., 0., 0., 0., 0., 0.125, 0.25, 0.375,
+                        0.375, 0.375, 0.5, 0.625, 0.75, 0.875, 0.875, 1.
+                    ],
+                    5: [0., 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125,
+                        0.125, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.
+                    ],
+                    6: [0., 0.01010101, 0.02020202, 0.03030303, 0.04040404,
+                        0.05050505, 0.06060606, 0.07070707, 0.08080808, 0.09090909,
+                        0.1010101, 0.11111111, 0.12121212, 0.13131313, 0.14141414,
+                        0.15151515, 0.16161616, 0.17171717, 0.18181818, 0.19191919,
+                        0.2020202, 0.21212121, 0.22222222, 0.23232323, 0.24242424,
+                        0.25252525, 0.26262626, 0.27272727, 0.28282828, 0.29292929,
+                        0.3030303, 0.31313131, 0.32323232, 0.33333333, 0.34343434,
+                        0.35353535, 0.36363636, 0.37373737, 0.38383838, 0.39393939,
+                        0.4040404, 0.41414141, 0.42424242, 0.43434343, 0.44444444,
+                        0.45454545, 0.46464646, 0.47474747, 0.48484848, 0.49494949,
+                        0.50505051, 0.51515152, 0.52525253, 0.53535354, 0.54545455,
+                        0.55555556, 0.56565657, 0.57575758, 0.58585859, 0.5959596,
+                        0.60606061, 0.61616162, 0.62626263, 0.63636364, 0.64646465,
+                        0.65656566, 0.66666667, 0.67676768, 0.68686869, 0.6969697,
+                        0.70707071, 0.71717172, 0.72727273, 0.73737374, 0.74747475,
+                        0.75757576, 0.76767677, 0.77777778, 0.78787879, 0.7979798,
+                        0.80808081, 0.81818182, 0.82828283, 0.83838384, 0.84848485,
+                        0.85858586, 0.86868687, 0.87878788, 0.88888889, 0.8989899,
+                        0.90909091, 0.91919192, 0.92929293, 0.93939394, 0.94949495,
+                        0.95959596, 0.96969697, 0.97979798, 0.98989899, 1.
+                    ]
+                }
+
+                var sin1 = [],
+                    sin2 = [],
+                    sin3 = [],
+                    sin4 = [],
+                    sin5 = [],
+                    sin6 = [],
+                    sin7 = [],
+                    diag = [{x:0,y:0},{x:1,y:1}]
+                for (var i = 0; i < fpr[0].length; i++) {
+                    sin1.push({
+                        x: fpr[0][i],
+                        y: tpr[0][i]
+                    });
+                    sin2.push({
+                        x: fpr[1][i],
+                        y: tpr[1][i]
+                    });
+                    sin3.push({
+                        x: fpr[2][i],
+                        y: tpr[2][i]
+                    });
+                    sin4.push({
+                        x: fpr[3][i],
+                        y: tpr[3][i]
+                    });
+                    sin5.push({
+                        x: fpr[4][i],
+                        y: tpr[4][i]
+                    });
+                    sin6.push({
+                        x: fpr[5][i],
+                        y: tpr[5][i]
+                    });
+                }
+
+                for (var i = 0; i < fpr[6].length; i++) {
+                  sin7.push({
+                        x: fpr[6][i],
+                        y: tpr[6][i]
+                    });
+                }
+                return [{
+                    area: false,
+                    values: sin1,
+                    key: "Class 1",
+                    color: "#ff7f0e",
+                    strokeWidth: 4,
+                    classed: 'dashed'
+                }, {
+                    values: sin2,
+                    key: "Class 2",
+                    color: "#2ca02c"
+                }, {
+                    values: sin3,
+                    key: "Class 3",
+                    color: "#2222ff"
+                }, {
+                    values: sin4,
+                    key: "Class 4",
+                    color: "#667711",
+                    strokeWidth: 3.5
+                }, {
+                    area: false,
+                    values: sin5,
+                    key: "Class 5",
+                    color: "#EF9CFB"
+                }, {
+                    area: false,
+                    values: sin6,
+                    key: "Class 6",
+                    color: "steelblue"
+                }, {
+                    area: false,
+                    values: sin7,
+                    key: "Average",
+                    color: "black"
+                }, {
+                    area: false,
+                    values: diag,
+                    key: "Diagonal",
+                    color: "#888888",
+                    classed: 'dashed'
+                }];
+            }
+
+            // NVD3 MultiBar Chart
+            render() {
+                //var test_data = stream_layers(3,128,.1).map(function(data, i) {
+                // var test_data = this.stream_layers(5, 128, .1).map(function(data, i) {
+                //     return {
+                //         key: 'Stream' + i, // Training Class
+                //         values: data, // Value
+                //         name: "Cell"
+                //     };
+                // });
+
+                // Reference for NVD3
+                var self = this;
+                var chart, data;
+                nv.addGraph(function() {
+                    chart = nv.models.lineChart()
+                        .options({
+                            transitionDuration: 300,
+                            useInteractiveGuideline: true
+                        });
+                    // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
+                    chart.xAxis
+                        .axisLabel("False Positive Rate (FPR)")
+                        .tickFormat(d3.format(',.1f'))
+                        .staggerLabels(true);
+                    chart.yAxis
+                        .axisLabel("True Positive Rate (TPR)")
+                        .tickFormat(function(d) {
+                            if (d == null) {
+                                return 'N/A';
+                            }
+                            return d3.format(',.2f')(d);
+                        });
+                    data = self.data;
+                    d3.select("#" + self.chartId + " svg")
+                        .datum(data)
+                        .call(chart);
+                    nv.utils.windowResize(chart.update);
+                    return chart;
+                });
+            }
+        }
+
+        Polymer(LinePolymer);
+    })();
+    </script>
+</dom-module>

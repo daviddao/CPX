@@ -1,0 +1,77 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!-- Preprocess the data delivered by bio-data-csv into feature data -->
+<dom-module id="bio-data-feature">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <div></div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'bio-data-feature',
+
+      properties: {
+        jsonData: {
+          type: Object,
+          value: '',
+          notify: true        
+        },
+        featureData: {
+          type: Object,
+          value: function() {
+            return {title: '', values: ''};
+          },
+          notify: true
+        }
+      },
+      extractFeatureData: function(selectedIndices, data) {
+        var indices = selectedIndices; // selected indices in form [from_row, from_cl, to_row, to_cl]
+        var tmp_data = data; //copy data
+        var headers = this.jsonData[0]; // Split data into header and values
+        // Set some stuff
+        var columnIdx = indices[1];
+        var rowStart = Math.min(indices[0], indices[2]);
+        var rowEnd = Math.max(indices[0], indices[2]);
+        this._updateTitle(headers[columnIdx]);
+        var columnData = this._filterColumn(tmp_data, columnIdx, rowStart, rowEnd);
+        this._updateValues(columnData);
+      },
+      // Private method to filter for a column
+      _filterColumn: function(matrix, columnIdx, rowStart, rowEnd) {
+        // Helper method to filter columns
+        var __filter_column = function(column,i) {
+          return i == columnIdx;
+        };
+        // Return the column value
+        var __map_column = function(row) {
+          var x = row.filter(__filter_column);
+          return x;
+        };
+        // Filter rows
+        var __filter_row = function(row,i) {
+          return (i >= rowStart) && (i <= rowEnd)
+        }
+        var res = matrix.filter(__filter_row).map(__map_column);
+        return res;
+      },
+      // Private Methods to update title and values
+      _updateTitle: function(title) {
+        this.featureData.title = title; // Set the featureData.title to the column name
+        this.notifyPath('featureData.title', this.featureData.title) // Need this in order to update bind probs
+      },
+      _updateValues: function(values) {
+        this.featureData.values = values; // Set the featureData.title to the column name
+        this.notifyPath('featureData.values', this.featureData.values) // Need this in order to update bind probs
+      }
+
+
+    });
+  })();
+  </script>
+</dom-module>
