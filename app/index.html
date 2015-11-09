@@ -41,7 +41,6 @@ David Dao, Broad Institute
     <!-- For shared styles, shared-styles.html import in elements.html -->
     <style is="custom-style" include="shared-styles"></style>
     <!-- Global dependencies for graphs -->
-    <script src="//d3js.org/d3.v3.min.js"></script>
 </head>
 
 <body unresolved class="fullbleed layout vertical">
@@ -106,6 +105,7 @@ David Dao, Broad Institute
                             <paper-material id="feature-inspector" elevation="1">
                                 <h2>{{feature.title}}</h2>
                                 <bio-data-stats feature-data="{{feature.values}}"></bio-data-stats>
+                                <bio-vis-hist id="histogram" feature-data="{{feature.values}}"></bio-vis-hist>
                             </paper-material>
                         </section>
                         <section data-route="feature-explorer">

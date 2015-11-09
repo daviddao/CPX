@@ -9,15 +9,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <!-- Dependencies -->
-
 <dom-module id="bio-vis-hist">
     <template>
         <style>
-        :host {
+        :host text {
+            font: 12px sans-serif;
+        }
+        
+        :host svg {
             display: block;
         }
         </style>
-
+        <content>
+            <div id="distHistogram" style="height:300px">
+                <svg id="distHistogramSVG" style="height:300px">
+                </svg>
+            </div>
+        </content>
     </template>
     <script>
     (function() {
@@ -27,11 +35,120 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             is: 'bio-vis-hist',
 
             properties: {
-                foo: {
-                    type: String,
-                    value: 'bio-vis-hist',
+                featureData: {
+                    type: Array,
+                    value: [],
                     notify: true
+                },
+                values: {
+                    type: Array,
+                    computed: '_flatten(featureData)',
+                    notify: true,
+                    observer: '_render'
                 }
+            },
+            ready: function() {
+                //Visualisation
+                var values = this._flatten(this.featureData);
+                this._render(this.values);
+            },
+            _render: function(values) {
+
+
+                var stream_layers = function(n, m, o) {
+                    if (arguments.length < 3) o = 0;
+
+                    function bump(a) {
+                        var x = 1 / (.1 + Math.random()),
+                            y = 2 * Math.random() - .5,
+                            z = 10 / (.1 + Math.random());
+                        for (var i = 0; i < m; i++) {
+                            var w = (i / m - y) * z;
+                            a[i] += x * Math.exp(-w * w);
+                        }
+                    }
+                    return d3.range(n).map(function() {
+                        var a = [],
+                            i;
+                        for (i = 0; i < m; i++) a[i] = o + o * Math.random();
+                        for (i = 0; i < 5; i++) bump(a);
+                        return a.map((d, i) => {
+                            return {
+                                x: i,
+                                y: Math.max(0, d)
+                            }
+                        });
+                    });
+                }
+
+                var test_data = stream_layers(5, 128, .1).map(function(data, i) {
+                    return {
+                        key: 'Stream' + i, // Training Class
+                        values: data, // Value
+                        name: "Cell"
+                    };
+                });
+
+                var hist = d3.layout.histogram();
+                hist.frequency(false); // Turn on probability
+
+                var hist_values = hist(values);
+                var data = {
+                    key: '',
+                    values: []
+                };
+                data["key"] = "test";
+                // Convert to nvd3 json format
+                for (var i = 0; i < hist_values.length; i++) {
+                    data["values"].push({
+                        x: hist_values[i].x,
+                        y: hist_values[i].y
+                    });
+                }
+                //console.log(data);
+
+                var self = this;
+                nv.addGraph({
+                    generate: function() {
+                        var chart = nv.models.multiBarChart()
+                            .stacked(true);
+
+                        // Custom tooltip 
+                        // chart.tooltip.contentGenerator(function(key, y, e, graph) {
+                        //   console.log(key)
+                        //  return  '<p>' + '</p>'
+                        // });
+
+                        chart.yAxis
+                            .axisLabel(self.$.distHistogram)
+                            .axisLabelDistance(-5)
+                            .tickFormat(d3.format(',.01f'));
+
+                        chart.dispatch.on('renderEnd', function() {
+                            console.log('Render Complete');
+                        });
+                        var svg = d3.select(self.$.distHistogramSVG)
+                            .datum([data]);
+
+                        console.log('calling chart');
+
+                        svg.transition().duration(0).call(chart);
+                        return chart;
+                    },
+                    callback: function(chart) {
+                        nv.utils.windowResize(chart.update);
+                    }
+                });
+            },
+            _flatten: function(data) {
+                var res = '';
+                // Test if its an array
+                if (Object.prototype.toString.call(data) === '[object Array]') {
+                    res = data.map(function(d) {
+                        return parseFloat(d[0])
+                    });
+                }
+                return res;
             }
         });
     })();

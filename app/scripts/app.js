@@ -49,7 +49,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 colHeaders: data.header,
                 rowHeaders: true,
                 stretchH: 'all',
-                columnSorting: false, //not working correctly, also its too slow for 50000+ datasets
+                columnSorting: true, //not working correctly, also its too slow for 50000+ datasets
                 readOnly: true
             });
 
@@ -95,8 +95,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 data: data.values,
                 colHeaders: data.header
             })
-            hot.render(); //otherwise just render new data
+            
         }
+        hot.updateSettings({
+                columnSorting: false // cheat for rendering
+            })
+        hot.render(); //otherwise just render new data
     })
 
     document.addEventListener('json-not-found', function(e) {

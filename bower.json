@@ -10,7 +10,8 @@
     "page": "visionmedia/page.js#~1.6.3",
     "handsontable": "~0.20.0",
     "comma-separated-values": "~3.6.4",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "nvd3": "~1.8.1"
   },
   "devDependencies": {
     "web-component-tester": "*",
