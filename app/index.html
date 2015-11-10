@@ -97,6 +97,8 @@ David Dao, Broad Institute
                                 <paper-input value="{{csvUrl::change}}" required auto-validate error-message="input required" label="Url to CSV File">
                                     <iron-icon icon="search" prefix></iron-icon>
                                 </paper-input>
+                                <paper-input value="{{key::change}}" required auto-validate error-message="input required" label="Grouping Key">
+                                </paper-input>
                             </paper-material>
                             <paper-material animated elevation="1">
                                 <h2>{{csvUrl}}</h2>
@@ -104,8 +106,8 @@ David Dao, Broad Institute
                             </paper-material>
                             <paper-material id="feature-inspector" elevation="1">
                                 <h2>{{feature.title}}</h2>
-                                <bio-data-stats feature-data="{{feature.values}}"></bio-data-stats>
-                                <bio-data-group id="groupByKey" csv-data="{{csvData}}"></bio-data-group>
+                                <bio-data-stats id="bio-data-stats" feature-data="{{feature.values}}"></bio-data-stats>
+                                <bio-data-group id="groupByKey" csv-data="{{csvData}}" key="{{key}}"></bio-data-group>
                                 <bio-vis-hist id="histogram" feature-data="{{feature.values}}"></bio-vis-hist>
                             </paper-material>
                         </section>
@@ -126,7 +128,6 @@ David Dao, Broad Institute
                             </paper-material>
                             <!-- Data Binding Example -->
                             <!-- <polybio-data data="{{test}}"></polybio-data>
-                            
                             <paper-material elevation="1">
                                 <polybio-hist chart-id="chart3"></polybio-hist>
                                 <a href="">More details</a>

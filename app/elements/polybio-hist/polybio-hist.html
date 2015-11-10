@@ -105,8 +105,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var self = this;
                 nv.addGraph({
                     generate: function() {
-                        var chart = nv.models.multiBarChart()
-                            .stacked(true);
+                        //var chart = nv.models.multiBarChart()
+                        //   .stacked(true);
+                        var chart = nv.models.discreteBarChart()
+                            .staggerLabels(true)
+                            .showValues(true)
 
                         // Custom tooltip 
                         // chart.tooltip.contentGenerator(function(key, y, e, graph) {

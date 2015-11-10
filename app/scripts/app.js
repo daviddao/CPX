@@ -69,6 +69,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             //featureInspector.extractFeatureData(selection, sortedData); // Call the featureInspector
                             featureInspector.extractFeatureData(selection);
                         }
+                        if (key == 'groupByClass') {
+                            var groupByKeyData = document.querySelector("#groupByKey").json; // Get a copy of the grouped data
+                            // get histogram
+                            var histogramEl = document.querySelector("#histogram");
+                            // now generate data and use histogram
+                            // First get the header key
+                            var selection = hot.getSelected();
+                            var featureInspector = document.getElementById('bio-data-feature');
+                            featureInspector.extractFeatureData(selection);
+                            var rowId = selection[1]; 
+                            var headers = hot.getColHeader();
+                            var rowName = headers[rowId];
+                            // Now filter data only for this header
+                            
+                            // Functional magic, creating a copy of the json data and generating a data
+                            var getKeyEl = function(d) {
+                                return parseFloat(d[rowName]); // only return row name, assume its a number
+                            }
+                            var selectKeyGetRow = function(d) {
+                                return {key: d["key"], values: d["values"].map(getKeyEl)}; 
+                            }
+                            var values = groupByKeyData.map(selectKeyGetRow);
+                            console.log(values);
+                            var stats = document.getElementById('bio-data-stats');
+                            var extend = [stats.min, stats.max];
+                            histogramEl.renderMultiBar(values,extend)
+                        }
                     },
                     items: {
                         "inspect": {
@@ -76,7 +103,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             disabled: function() {
                                 // if select more than a row
                                 var val = hot.getSelected(); 
-                                return val[1] !== val[3]
+                                return val[1] !== val[3];
+                            }
+                        },
+                        "groupByClass": {
+                            name: 'Group by Class',
+                            disabled: function() {
+                                // if select more than a row
+                                var val = hot.getSelected(); 
+                                return val[1] !== val[3];
                             }
                         },
                         "hsep1": "---------",

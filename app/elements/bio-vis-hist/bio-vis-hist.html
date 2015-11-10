@@ -40,8 +40,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     value: [],
                     notify: true
                 },
+                // Array of grouped objects
                 values: {
-                    type: Array,
+                    type: Object,
                     computed: '_flatten(featureData)',
                     notify: true,
                     observer: '_render'
@@ -52,26 +53,69 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var values = this._flatten(this.featureData);
                 this._render(this.values);
             },
+            // Public function to render histograms
             _render: function(values) {
 
                 var hist = d3.layout.histogram();
-                hist.frequency(false); // Turn on probability
+                hist.frequency(true); // Turn on probability
+                
+                var dataList = []; // Create data list to group data
+                
+                for (var i = 0; i < values.length; i++) {
+                    
+                    console.log(i)
+                    console.log(i, values[i]["key"]);
 
-                var hist_values = hist(values);
-                var data = {
-                    key: '',
-                    values: []
-                };
-                data["key"] = "Feature";
-                // Convert to nvd3 json format
-                for (var i = 0; i < hist_values.length; i++) {
-                    data["values"].push({
-                        x: (hist_values[i].x).toFixed(2),
-                        y: hist_values[i].y
-                    });
+                    var hist_values = hist(values[i]["values"]);
+                    var data = {
+                        key: '',
+                        values: []
+                    };
+                    data["key"] = values[i]["key"];
+                    // Convert to nvd3 json format
+                    for (var j = 0; j < hist_values.length; j++) {
+                        data["values"].push({
+                            x: (hist_values[j].x),
+                            y: hist_values[j].y
+                        });
+                    }
+                    dataList.push(data);
                 }
-                //console.log(data);
+                this._createHist(dataList);
+                
+            },
+            renderMultiBar: function(values, extend) {
+                var hist = d3.layout.histogram();
+                hist.frequency(true); // Turn on probability
+                hist.range(extend);
+                hist.bins(8);
 
+                var dataList = []; // Create data list to group data
+                
+                for (var i = 0; i < values.length; i++) {
+                    
+                    console.log(i)
+                    console.log(i, values[i]["key"]);
+
+                    var hist_values = hist(values[i]["values"]);
+                    var data = {
+                        key: '',
+                        values: []
+                    };
+                    data["key"] = values[i]["key"];
+                    // Convert to nvd3 json format
+                    for (var j = 0; j < hist_values.length; j++) {
+                        data["values"].push({
+                            x: (hist_values[j].x),
+                            y: hist_values[j].y
+                        });
+                    }
+                    dataList.push(data);
+                }
+                //console.log(values.length);
+                this._createHist(dataList);
+            },
+            _createHist: function(dataList) {
                 var self = this;
                 nv.addGraph({
                     generate: function() {
@@ -85,15 +129,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         // });
 
                         chart.yAxis
-                            .axisLabel("Probability")
-                            .axisLabelDistance(-5)
+                            .axisLabel("Frequency")
+                            .axisLabelDistance(-7)
                             .tickFormat(d3.format(',.01f'));
+
+                        chart.xAxis
+                            .axisLabel("Values")
+                            .axisLabelDistance(-3)
+                            .tickFormat(d3.format(',.04f'));
 
                         chart.dispatch.on('renderEnd', function() {
                             console.log('Render Complete');
                         });
                         var svg = d3.select(self.$.distHistogramSVG)
-                            .datum([data]);
+                            .datum(dataList);
 
                         console.log('calling chart');
 
@@ -110,10 +159,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 // Test if its an array
                 if (Object.prototype.toString.call(data) === '[object Array]') {
                     res = data.map(function(d) {
-                        return parseFloat(d[0]);
+                        return parseFloat(d[0]); 
                     });
                 }
-                return res;
+                return [{key: "All", values: res}]; // We put it in an object so we can have different groups
             }
         });
     })();

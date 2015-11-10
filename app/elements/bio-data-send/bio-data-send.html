@@ -10,44 +10,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<dom-module id="bio-data-group">
+<dom-module id="bio-data-send">
   <template>
     <style>
       :host {
         display: block;
       }
     </style>
+    <div>Hello from <span>{{foo}}</span></div>
   </template>
   <script>
   (function() {
     'use strict';
 
     Polymer({
-      is: 'bio-data-group',
+      is: 'bio-data-send',
 
       properties: {
-        csvData: {
+        foo: {
           type: String,
-          value: '',
-          notify: true
-        },
-        key: {
-          type: String,
-          value: 'Class',
-          notify: true
-        },
-        json: {
-          type: Object,
-          computed: '_groupByKey(csvData, key)',
+          value: 'bio-data-send',
           notify: true
         }
-      },
-      // group csv data given a key
-      _groupByKey: function(csvData, key) {
-        // parsed data
-        var json = d3.csv.parse(csvData);
-        return d3.nest().key(function(d) {return d[key]})
-        .entries(json);
       }
     });
   })();
