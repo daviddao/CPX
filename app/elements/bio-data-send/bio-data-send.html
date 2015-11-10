@@ -7,33 +7,80 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <dom-module id="bio-data-send">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <div>Hello from <span>{{foo}}</span></div>
-  </template>
-  <script>
-  (function() {
-    'use strict';
-
-    Polymer({
-      is: 'bio-data-send',
-
-      properties: {
-        foo: {
-          type: String,
-          value: 'bio-data-send',
-          notify: true
+    <template>
+        <style>
+        :host {
+            display: block;
         }
-      }
-    });
-  })();
-  </script>
+        </style>
+        <!-- ajax call to our csv file -->
+        <iron-ajax id="ironPost" url="{{url}}" method="POST" content-type="application/json" body="{{body}}" handle-as="json" last-response="{{response}}"></iron-ajax>
+        <h3>Accuracy Report</h3>
+        <p>
+            <paper-spinner id="spinner"></paper-spinner>
+        </p>
+        <table align="center">
+            <tr>
+                <th>Algorithm</th>
+                <th>Score</th>
+            </tr>
+            <template is="dom-repeat" items="{{response.accuracy}}">
+                <tr>
+                    <td>{{item.name}}</td>
+                    <td align="center">{{item.score}}</td>
+                </tr>
+            </template>
+        </table>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'bio-data-send',
+
+            properties: {
+                url: {
+                    type: String,
+                    value: 'http://localhost:8080/run',
+                    notify: true
+                },
+                csvData: {
+                    type: String,
+                    notify: true
+                },
+                response: {
+                    type: Object,
+                    notify: true,
+                    observer: 'sendEvent'
+                },
+                body: {
+                    type: Object,
+                    notify: true,
+                    computed: '_formJson(csvData)'
+                }
+            },
+            triggerRequest: function() {
+                var ironPostEl = this.$.ironPost;
+                ironPostEl.generateRequest();
+                var spinner = this.$.spinner;
+                spinner.setAttribute("active","True");
+            },
+            sendEvent: function(newValue) {
+                var spinner = this.$.spinner;
+                spinner.removeAttribute("active");
+                this.fire("server-responds", {
+                    response: newValue
+                });
+            },
+            _formJson: function(csvData) {
+                var json = d3.csv.parse(csvData);
+                return json;
+            }
+        });
+    })();
+    </script>
 </dom-module>

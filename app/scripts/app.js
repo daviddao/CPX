@@ -29,7 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     // Saves the table and data
-    var hot;
+    app.hot;
     window.data = {
         header: '',
         values: ''
@@ -42,8 +42,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data.values = e.detail.values;
         data.header = e.detail.header;
         // If hot is undefined, create a hot table
-        if (hot === undefined) {
-            hot = new Handsontable(container, {
+        if (app.hot === undefined) {
+            app.hot = new Handsontable(container, {
                 data: data.values,
                 height: 396,
                 colHeaders: data.header,
@@ -53,7 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 readOnly: true
             });
 
-            hot.updateSettings({
+            app.hot.updateSettings({
                 contextMenu: {
                     callback: function(key, options) {
                         if (key === 'about') {
@@ -64,7 +64,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         }
                         if (key === 'inspect') {
                             var featureInspector = document.getElementById('bio-data-feature');
-                            var selection = hot.getSelected();
+                            var selection = app.hot.getSelected();
                             //var sortedData = hot.getData(0, 0, hot.countRows() - 1, hot.countCols() - 1); //a bit hacky to get the sorted data
                             //featureInspector.extractFeatureData(selection, sortedData); // Call the featureInspector
                             featureInspector.extractFeatureData(selection);
@@ -75,11 +75,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             var histogramEl = document.querySelector("#histogram");
                             // now generate data and use histogram
                             // First get the header key
-                            var selection = hot.getSelected();
+                            var selection = app.hot.getSelected();
                             var featureInspector = document.getElementById('bio-data-feature');
                             featureInspector.extractFeatureData(selection);
                             var rowId = selection[1]; 
-                            var headers = hot.getColHeader();
+                            var headers = app.hot.getColHeader();
                             var rowName = headers[rowId];
                             // Now filter data only for this header
                             
@@ -102,7 +102,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             name: 'Inspect Feature',
                             disabled: function() {
                                 // if select more than a row
-                                var val = hot.getSelected(); 
+                                var val = app.hot.getSelected(); 
                                 return val[1] !== val[3];
                             }
                         },
@@ -110,7 +110,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             name: 'Group by Class',
                             disabled: function() {
                                 // if select more than a row
-                                var val = hot.getSelected(); 
+                                var val = app.hot.getSelected(); 
                                 return val[1] !== val[3];
                             }
                         },
@@ -126,16 +126,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             })
         } else {
-            hot.updateSettings({
+            app.hot.updateSettings({
                 data: data.values,
-                colHeaders: data.header
+                colHeaders: data.header,
+                height: 396
             })
             
         }
-        hot.updateSettings({
+        app.hot.updateSettings({
                 columnSorting: false // cheat for rendering
             })
-        hot.render(); //otherwise just render new data
+        app.hot.render(); //otherwise just render new data
     })
 
     document.addEventListener('json-not-found', function(e) {
