@@ -1,0 +1,100 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<dom-module id="bio-vis-line">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        :host svg {
+            display: block;
+        }
+        </style>
+        <content>
+            <div id="PRline" style="height:500px">
+                <svg id="PRlineSVG" style="height:500px">
+                </svg>
+            </div>
+        </content>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'bio-vis-line',
+
+            properties: {
+                precisionRecallData: {
+                    type: Object,
+                    computed: 'extractPrecisionRecall(response)',
+                    notify: true
+                },
+                response: {
+                    type: Object,
+                    notify: true
+                }
+            },
+            extractPrecisionRecall: function(response) {
+              var data = [];
+              var precisionRecall = response["precision-recall"];
+              // iterate through all machine learning algorithms
+              for (var i = 0; i < precisionRecall.length; i++) {
+                var d = {}
+                d["key"] = precisionRecall[i]["name"];
+                d["values"] = [];
+
+                // iterate through the values
+                for (var j = 0; j < precisionRecall[i]["precision"].length; j++) {
+                  var el = {}
+                  el.x = precisionRecall[i]["precision"][j]["value"];
+                  el.y = precisionRecall[i]["recall"][j]["value"];
+                  d["values"].push(el);
+                }
+                data.push(d);
+              }
+              this._renderPrecisionRecall(data);
+              return data;
+            },
+            _renderPrecisionRecall: function(newData) {
+                var self = this;
+                var chart;               
+                nv.addGraph(function() {
+                    chart = nv.models.lineChart()
+                        .options({
+                            transitionDuration: 300,
+                            useInteractiveGuideline: true
+                        });
+                    // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
+                    chart.xAxis
+                        .axisLabel("Recall")
+                        .tickFormat(d3.format(',.1f'))
+                        .staggerLabels(true);
+                    chart.yAxis
+                        .axisLabel("Precision")
+                        .tickFormat(function(d) {
+                            if (d == null) {
+                                return 'N/A';
+                            }
+                            return d3.format(',.2f')(d);
+                        });
+                    data = self.data;
+                    d3.select(self.$.PRlineSVG)
+                        .datum(newData)
+                        .call(chart);
+                    nv.utils.windowResize(chart.update);
+                    return chart;
+                });
+            }
+        });
+    })();
+    </script>
+</dom-module>

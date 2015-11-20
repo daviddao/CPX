@@ -9,7 +9,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-
 <!-- Link dependencies -->
 <link rel="import" href="./comma-separated-values.html">
 <dom-module id="bio-data-csv">
@@ -18,14 +17,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         :host {
             display: block;
         }
+        
+        :host #drop_zone {
+            border: 2px dashed #bbb;
+            -moz-border-radius: 5px;
+            margin: 10px 0;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            padding: 25px;
+            text-align: center;
+            font: 20pt bold 'Vollkorn';
+            color: #bbb;
+        }
         </style>
-    <!-- ajax call to our csv file -->
-    <iron-ajax
-       auto
-       url="{{csvUrl}}"
-       handle-as="text"
-       last-response="{{csvData}}"></iron-ajax>
-    <div>{{computeJSON(csvData)}}</div>
+        <p>
+            <h3>Load CSV</h3>
+            <input type="file" id="csvData" />
+            <div id="drop_zone">Drop file here</div>
+            <output id="list"></output>
+        </p>
+        <iron-ajax auto url="{{csvUrl}}" handle-as="text" last-response="{{csvData}}"></iron-ajax>
+        <div>{{computeJSON(csvData)}}</div>
     </template>
     <script>
     (function() {
@@ -36,33 +48,102 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             properties: {
                 jsonData: {
-                  type: Object,
-                  value: '',
-                  notify: true
+                    type: Object,
+                    value: '',
+                    notify: true
                 },
                 csvUrl: {
-                  type: String,
-                  value: "../../data/training.csv",
-                  notify: true
+                    type: String,
+                    value: "../../data/malaria.csv",
+                    notify: true
                 },
                 csvData: {
-                  type: String,
-                  value: '',
-                  notify: true
+                    type: String,
+                    value: '',
+                    notify: true
                 }
             },
+            ready: function() {
+              this.dropFile();
+            },
+            dropFile: function() {
+                var that = this;
 
+                function handleFileSelect(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+
+                    var files = evt.dataTransfer.files; // FileList object
+
+                    // files is a FileList of File objects. List some properties.
+                    var output = [];
+                    for (var i = 0, f; f = files[i]; i++) {
+                        output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                            f.size, ' bytes, last modified: ',
+                            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                            '</li>');
+                    }
+                    that.$.list.innerHTML = '<ul>' + output.join('') + '</ul>';
+                    that.$.csvData.files = files
+
+                    var r = new FileReader();
+                    r.onload = function(e) {
+                        that.csvData = e.target.result;
+                    }
+                    r.readAsText(files[0])
+                }
+
+                // handle upload
+                function handleUpload(evt) {
+                    var files = evt.target.files; // FileList object
+                    console.log(files)
+
+                    // files is a FileList of File objects. List some properties.
+                    var output = [];
+                    for (var i = 0, f; f = files[i]; i++) {
+                        output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                            f.size, ' bytes, last modified: ',
+                            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                            '</li>');
+                    }
+                    that.$.list.innerHTML = '<ul>' + output.join('') + '</ul>';
+                    that.$.csvData.files = files
+
+                    var r = new FileReader();
+                    r.onload = function(e) {
+                        that.csvData = e.target.result; 
+                    }
+                    r.readAsText(files[0])
+                }
+
+                function handleDragOver(evt) {
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+                }
+
+                // Setup the dnd listeners.
+                var dropZone = that.$.drop_zone;
+                dropZone.addEventListener('dragover', handleDragOver, false);
+                dropZone.addEventListener('drop', handleFileSelect, false);
+
+                var csvData = that.$.csvData;
+                csvData.addEventListener('change', handleUpload, false)
+            },
             // Computes JSON data when csvData is loaded
             computeJSON: function(csvData) {
-              var csv = new CSV(csvData);
-              this.jsonData = csv.parse();
-              var values = this.jsonData.slice(); // copy data
-              var header = values.shift() // removes the first element from values
-              if(header != undefined && header[0] != "<!DOCTYPE") {
-                this.fire('json-loaded', {header: header,values: values}); // Fire an event
-              } else {
-                this.fire('json-not-found', {}); 
-              }
+                var csv = new CSV(csvData);
+                this.jsonData = csv.parse();
+                var values = this.jsonData.slice(); // copy data
+                var header = values.shift() // removes the first element from values
+                if (header != undefined && header[0] != "<!DOCTYPE") {
+                    this.fire('json-loaded', {
+                        header: header,
+                        values: values
+                    }); // Fire an event
+                } else {
+                    this.fire('json-not-found', {});
+                }
             }
         });
     })();

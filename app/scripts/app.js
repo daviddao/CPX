@@ -107,16 +107,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             }
                         },
                         "groupByClass": {
-                            name: 'Group by Class',
+                            name: 'Group by Key',
                             disabled: function() {
                                 // if select more than a row
                                 var val = app.hot.getSelected(); 
                                 return val[1] !== val[3];
                             }
-                        },
-                        "hsep1": "---------",
-                        "remove_row": {
-                            name: 'Remove this row, ok?'
                         },
                         "hsep2": "---------",
                         "about": {

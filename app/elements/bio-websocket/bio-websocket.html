@@ -1,0 +1,176 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="stylesheet" type="text/css" href="../../bower_components/jsoneditor/dist/jsoneditor.min.css"></link>
+<script src="../../bower_components/jsoneditor/dist/jsoneditor.js"></script>
+<dom-module id="bio-websocket">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        
+        paper-slider {
+            width: 50%;
+            margin: 10px 0;
+        }
+        
+        paper-dialog {
+            border: 2px solid;
+            border-color: grey;
+            background-color: white;
+            color: black;
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            overflow: auto;
+        }
+        </style>
+        <p>
+            <h3>Select Classifier</h3>
+            <paper-radio-group id="selectedClassifier" selected="RandomForestClassifier">
+                <paper-radio-button name="RandomForestClassifier">RandomForestClassifier</paper-radio-button>
+                <paper-radio-button name="AdaBoostClassifier">AdaBoostClassifier</paper-radio-button>
+                <br>
+                <paper-radio-button name="LinearSVC">SupportVectorMachine (Liblinear)</paper-radio-button>
+                <paper-radio-button name="SVC">SupportVectorMachine (LibSVM)</paper-radio-button>
+                <br>
+                <paper-radio-button name="LogisticRegression">LogisticRegression</paper-radio-button>
+                <paper-radio-button name="LinearDiscriminantAnalysis">LinearDiscriminantAnalysis</paper-radio-button>
+                <br>
+                <paper-radio-button name="KNeighborsClassifier">KNeighborsClassifier</paper-radio-button>
+                <paper-radio-button name="GradientBoostingClassifier">GradientBoostingClassifier</paper-radio-button>
+            </paper-radio-group>
+        </p>
+        <p>
+            <h4>Hyper Parameter Optimization</h4>
+            <paper-toggle-button id="selectedHyperParameter"></paper-toggle-button>
+        </p>
+        <p>
+            <h4>Cross Validation Splits</h4>
+            <paper-slider min="1" max="20" value="5" editable id="selectedSplits"></paper-slider>
+        </p>
+        <paper-button raised on-click="sendRequest">Train Classifier
+        </paper-button>
+        <paper-button raised on-click="getParams" data-dialog="modal">Edit Parameters</paper-button>
+        <paper-dialog id="modal" modal style="height:700px">
+            <h2>Edit Hyperparameters</h2>
+            <p>
+                <div id="jsonEditor"></div>
+            </p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus on-click="saveParams">Save</paper-button>
+            </div>
+        </paper-dialog>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'bio-websocket',
+
+            properties: {
+                url: {
+                    type: String,
+                    value: "ws://localhost:8002/classifiersocket"
+                },
+                updater: {
+                    type: Object,
+                    value: function() {
+                        var that = this; // Save reference
+                        var updater = {
+                            socket: null,
+                            start: function() {
+                                updater.socket = new WebSocket(that.url);
+                                updater.socket.onmessage = function(event) {
+                                    console.log(JSON.parse(event.data));
+                                }
+                            }
+                        };
+                        return updater
+                    }
+                }
+            },
+            ready: function() {
+                this.updater.start();
+                var container = this.$.jsonEditor;
+
+                this.editor = new JSONEditor(container);
+            },
+            sendRequest: function(event) {
+                var json = this.generateJson(); // Create a JSON File send to the server
+                var string = JSON.stringify(json);
+                console.log(string)
+                this.updater.socket.send(string);
+            },
+            generateJson: function() {
+                // Get the seletected Classifier Name
+                var classifierInput = this.$.selectedClassifier;
+                var classifierName = classifierInput.selected;
+
+                // Get if Hyperparameter is activated
+                var hpInput = this.$.selectedHyperParameter;
+                var hpChecked = hpInput.checked;
+
+                // Get number of cross validation splits
+                var cvInput = this.$.selectedSplits;
+                var cvSplits = cvInput.value
+
+                // Messenger JSON
+                var json = [{
+                    "classifier": classifierName,
+                    "hp": hpChecked,
+                    "splits": cvSplits,
+                    "get_params": false,
+                    "set_params": false,
+                    "train": false
+                }]
+
+                // Create and return JSON
+                return json;
+            },
+            getParams: function(e) {
+                var json = this.generateJson();
+                json[0]["get_params"] = true;
+                var string = JSON.stringify(json);
+                this.updater.socket.send(string); // Send socket request for params
+                var button = e.target;
+                var that = this;
+
+                this.updater.socket.onmessage = function(event) {
+                    var json = JSON.parse(event.data);
+                    that.editor.set(json);
+                    var id = button.getAttribute('data-dialog');
+                    var dialog = document.getElementById(id);
+                    if (dialog) {
+                        dialog.open();
+                    }
+                }
+            },
+            saveParams: function(e) {
+                var json = this.generateJson();
+                var params = this.editor.get();
+                json[0]["params"] = params;
+                json[0]["set_params"] = true;
+                var string = JSON.stringify(json);
+                this.updater.socket.send(string);
+            }
+        });
+    })();
+    </script>
+</dom-module>

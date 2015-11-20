@@ -1,0 +1,90 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<dom-module id="bio-data-http">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        
+        iron-icon {
+            transition: all 0.2s;
+            -webkit-transition: all 0.2s;
+            color: green;
+        }
+        </style>
+        <!-- ajax call to our csv file -->
+        <iron-ajax id="ironPost" url="{{url}}" method="POST" params="{{params}}" content-type="application/json" body="{{body}}" handle-as="json" last-response="{{response}}"></iron-ajax>
+        <paper-button raised on-click="triggerRequest">Send Data to Server</paper-button>
+        <iron-icon icon="done-all" id="done" style="visibility:hidden"></iron-icon>
+        <p>
+            <paper-spinner id="spinner"></paper-spinner>
+        </p>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'bio-data-http',
+
+            properties: {
+                url: {
+                    type: String,
+                    value: 'http://localhost:8002/csv',
+                    notify: true
+                },
+                csvData: {
+                    type: String,
+                    notify: true
+                },
+                response: {
+                    type: Object,
+                    notify: true,
+                    observer: 'sendEvent'
+                },
+                body: {
+                    type: Object,
+                    notify: true,
+                    computed: '_formJson(csvData)'
+                },
+                params: {
+                    type: Number,
+                    notify: true
+                }
+            },
+            triggerRequest: function() {
+                var ironPostEl = this.$.ironPost;
+                ironPostEl.generateRequest(); //Send the request
+                var spinner = this.$.spinner;
+                spinner.setAttribute("active", "True");
+                var icon = this.$.done;
+                icon.style.visibility = "hidden";
+            },
+            sendEvent: function(newValue) {
+                var spinner = this.$.spinner;
+                spinner.removeAttribute("active");
+                var icon = this.$.done;
+                icon.style.visibility = "visible";
+                this.fire("server-responds", {
+                    response: newValue
+                });
+            },
+            _formJson: function(csvData) {
+                var json = d3.csv.parse(csvData);
+                return json;
+            }
+        });
+    })();
+    </script>
+</dom-module>

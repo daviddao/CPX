@@ -56,10 +56,6 @@ David Dao, Broad Institute
                 <!-- Drawer Content -->
                 <paper-menu class="list" attr-for-selected="data-route" selected="[[route]]">
                     <a data-route="home" href="/" on-click="onDataRouteClick">
-                        <iron-icon icon="help-outline"></iron-icon>
-                        <span>Help</span>
-                    </a>
-                    <a data-route="feature-explorer" href="/feature-explorer" on-click="onDataRouteClick">
                         <iron-icon icon="explore"></iron-icon>
                         <span>Feature Explorer</span>
                     </a>
@@ -67,10 +63,14 @@ David Dao, Broad Institute
                         <iron-icon icon="settings-applications"></iron-icon>
                         <span>Model Validation</span>
                     </a>
-                    <a data-route="graph-view" href="/graph-view" on-click="onDataRouteClick">
+                    <a data-route="feature-explorer" href="/feature-explorer" on-click="onDataRouteClick">
+                        <iron-icon icon="help-outline"></iron-icon>
+                        <span>Help</span>
+                    </a>
+                    <!-- <a data-route="graph-view" href="/graph-view" on-click="onDataRouteClick">
                         <iron-icon icon="3d-rotation"></iron-icon>
                         <span>3D Graph View</span>
-                    </a>
+                    </a> -->
                 </paper-menu>
             </paper-scroll-header-panel>
             <!-- Main Area -->
@@ -88,74 +88,51 @@ David Dao, Broad Institute
                 </paper-toolbar> -->
                 <!-- Main Content -->
                 <!-- Data Processing Pipeline -->
-                <bio-data-csv id="bio-data-csv" csv-url="{{csvUrl}}" csv-data="{{csvData}}" json-data="{{json}}"></bio-data-csv>
                 <bio-data-feature id="bio-data-feature" json-data="{{json}}" feature-data="{{feature}}"></bio-data-feature>
                 <div class="content">
                     <iron-pages attr-for-selected="data-route" selected="{{route}}">
                         <section data-route="home">
                             <paper-material elevation="1">
+                                <bio-data-csv id="bio-data-csv" csv-url="{{csvUrl}}" csv-data="{{csvData}}" json-data="{{json}}"></bio-data-csv>
+                                <p>or</p>
                                 <paper-input value="{{csvUrl::change}}" required auto-validate error-message="input required" label="Url to CSV File">
                                     <iron-icon icon="search" prefix></iron-icon>
                                 </paper-input>
-                                <paper-input value="{{key::change}}" required auto-validate error-message="input required" label="Grouping Key">
-                                </paper-input>
                             </paper-material>
                             <paper-material animated elevation="1">
-                                <h2>{{csvUrl}}</h2>
+                                <h4>Data Table</h4>
+                                <paper-input value="{{key::change}}" required auto-validate error-message="input required" label="Grouping Key">
+                                </paper-input>
                                 <div id="table"></div>
                             </paper-material>
                             <paper-material id="feature-inspector" elevation="1">
-                                <h2>{{feature.title}}</h2>
+                                <h4>{{feature.title}}</h4>
                                 <bio-data-stats id="bio-data-stats" feature-data="{{feature.values}}"></bio-data-stats>
                                 <bio-data-group id="groupByKey" csv-data="{{csvData}}" key="{{key}}"></bio-data-group>
                                 <bio-vis-hist id="histogram" feature-data="{{feature.values}}"></bio-vis-hist>
                             </paper-material>
+                            <!-- <paper-material elevation="1">
+                                <img-box></img-box>    
+                            </paper-material> -->
                         </section>
                         <section data-route="feature-explorer">
                             <paper-material elevation="1">
                                 <h2 class="page-title"><span>Feature Explorer</span></h2>
                             </paper-material>
-                            <!-- Data Binding Example -->
-                            <!-- <polybio-data data="{{test}}"></polybio-data>
-                            <paper-material elevation="1">
-                                <polybio-hist chart-id="chart3"></polybio-hist>
-                                <a href="">More details</a>
-                            </paper-material>
-                            <paper-material elevation="1">
-                                <polybio-hist chart-id="chart4"></polybio-hist>
-                                <a href="">More details</a>
-                            </paper-material> -->
                         </section>
                         <section data-route="model-validation">
-                            <script>
-                            var sendRequest = function() {
-                                var sendEl = document.querySelector("#bio-data-send");
-                                sendEl.triggerRequest();
-                                var spinner = document.querySelector("#spinner");
-                                spinner.setAttribute("active","True");
-                                spinner.addEventListener("response",function(e){
-                                    spinner.setAttribute("active","False");
-                                })
-                            }
-                            </script>
                             <paper-material elevation="1">
                                 <h2 class="page-title"><span>Model Validation</span></h2>
-                                <p id="submit-page">
-                                    <bio-data-send id="bio-data-send" csv-data="{{csvData}}" response="{{response}}"></bio-data-send>
-                                    <br>
+                                <bio-data-http id="bio-data-send" csv-data="{{csvData}}" response="{{response}}"></bio-data-http>
+                                <bio-websocket></bio-websocket>
+                                <!-- <p id="submit-page">
                                     <paper-button raised onclick="sendRequest()">Submit Data
                                     </paper-button>
-                                    <p>
-                                    <paper-spinner id="spinner"></paper-spinner>
-                                    </p>
-                                </p>
+                                    <paper-button raised>Download Model</paper-button>
+                                  <bio-data-send id="bio-data-send" csv-data="{{csvData}}" response="{{response}}"></bio-data-send>
+                                    <br>
+                                </p> -->
                             </paper-material>
-                            <!-- <paper-material>
-                                <polybio-roc></polybio-roc>
-                            </paper-material>
-                            <paper-material elevation="1">
-                                <img-box></img-box>
-                            </paper-material> -->
                         </section>
                         <section data-route="user-info">
                             <paper-material elevation="1">

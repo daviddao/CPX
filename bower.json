@@ -11,7 +11,8 @@
     "handsontable": "~0.20.0",
     "comma-separated-values": "~3.6.4",
     "lodash": "~3.10.1",
-    "nvd3": "~1.8.1"
+    "nvd3": "~1.8.1",
+    "jsoneditor": "~4.2.1"
   },
   "devDependencies": {
     "web-component-tester": "*",

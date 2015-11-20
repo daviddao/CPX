@@ -9,6 +9,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bio-vis-line/bio-vis-line.html">
+<link rel="import" href="../bio-vis-roc/bio-vis-roc.html">
+
 <dom-module id="bio-data-send">
     <template>
         <style>
@@ -17,15 +20,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         </style>
         <!-- ajax call to our csv file -->
-        <iron-ajax id="ironPost" url="{{url}}" method="POST" content-type="application/json" body="{{body}}" handle-as="json" last-response="{{response}}"></iron-ajax>
-        <h3>Accuracy Report</h3>
+        <iron-ajax id="ironPost" url="{{url}}" method="POST" params="{{params}}" content-type="application/json" body="{{body}}" handle-as="json" last-response="{{response}}"></iron-ajax>
+
         <p>
             <paper-spinner id="spinner"></paper-spinner>
         </p>
+        <h3>Cross Validation Report</h3>
         <table align="center">
             <tr>
                 <th>Algorithm</th>
-                <th>Score</th>
+                <th>Accuracy (%)</th>
+                <th>Standard Deviation</th>
+                <th>Time</th>
+            </tr>
+            <template is="dom-repeat" items="{{response.crossvalidate}}">
+                <tr>
+                    <td>{{item.name}}</td>
+                    <td align="center">{{item.score}}</td>
+                    <td align="center">{{item.std}}</td>
+                    <td align="center">{{item.time}}</td>
+                </tr>
+            </template>
+        </table>
+        <!-- <h3>Accuracy Report</h3>
+        <table align="center">
+            <tr>
+                <th>Algorithm</th>
+                <th>Score (%)</th>
             </tr>
             <template is="dom-repeat" items="{{response.accuracy}}">
                 <tr>
@@ -34,6 +55,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </tr>
             </template>
         </table>
+        <h3>Training Time Report</h3>
+        <table align="center">
+            <tr>
+                <th>Algorithm</th>
+                <th>Time (s)</th>
+            </tr>
+            <template is="dom-repeat" items="{{response.runtime}}">
+                <tr>
+                    <td>{{item.name}}</td>
+                    <td align="center">{{item.time}}</td>
+                </tr>
+            </template>
+        </table>
+        <h3>Precision Recall Curve</h3>
+        <bio-vis-line response="{{response}}"></bio-vis-line>
+        <h3>ROC Curve</h3>
+        <bio-vis-roc response="{{response}}"></bio-vis-roc> -->
     </template>
     <script>
     (function() {
@@ -61,6 +99,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     notify: true,
                     computed: '_formJson(csvData)'
+                },
+                params: {
+                    type: Number,
+                    notify: true,
+                    value: function() {
+                      return {
+                        "class": 0
+                      }
+                    }
                 }
             },
             triggerRequest: function() {
