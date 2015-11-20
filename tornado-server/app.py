@@ -29,6 +29,33 @@ import uuid
 from tornado.options import define, options
 
 import pandas as pd
+import time
+
+### MODELS
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+import sklearn.svm
+from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.multiclass import OneVsRestClassifier
+###
+
+### VALIDATION
+from sklearn import preprocessing
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import label_binarize
+from sklearn.cross_validation import train_test_split
+from sklearn.cross_validation import KFold
+from sklearn.cross_validation import StratifiedKFold
+from sklearn.cross_validation import cross_val_score
+###
+
 
 define("port", default=8002, help="run on the given port", type=int)
 
@@ -117,17 +144,6 @@ def crazy():
 # The model for the Tornado Web Application
 class Model():
 
-    from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.naive_bayes import GaussianNB
-    import sklearn.svm
-    from sklearn.svm import SVC
-    from sklearn.svm import LinearSVC
-    from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier, VotingClassifier
-    from sklearn.tree import DecisionTreeClassifier
-    from sklearn.neighbors import KNeighborsClassifier
-    from sklearn.multiclass import OneVsRestClassifier
-
 
     # Dictionary with supported sklearn models (and more in the future)
 
@@ -161,7 +177,14 @@ class Model():
 
     @classmethod
     def updateTrainingSet(cls, df):
-        cls.trainingSet = df
+        # Some preprocessing
+        y = df.pop("Class")
+        y = y.values
+        X = df.values
+
+        cls.trainingSet = {}
+        cls.trainingSet["X"] = X
+        cls.trainingSet["y"] = y
 
     @classmethod
     def getTrainingSet(cls):
@@ -174,6 +197,17 @@ class Model():
     @classmethod
     def setParams(cls, classifierName, params):
         cls.models[classifierName].set_params(**params)
+
+    @classmethod
+    def getCV(cls, splits):
+        
+        n = len(cls.trainingSet["y"])
+        cv = KFold(n, n_folds=splits, shuffle=True)
+
+        return cv
+
+        
+
 
 
 
@@ -236,7 +270,7 @@ class CSVHandler(CorsMixin, tornado.web.RequestHandler):
         trainingSet = Model.getTrainingSet()
         # logging.info(trainingSet)
     
-
+# Controller ? 
 class ClassifierSocketHandler(tornado.websocket.WebSocketHandler):
     waiters = set()
     cache = []
@@ -275,8 +309,7 @@ class ClassifierSocketHandler(tornado.websocket.WebSocketHandler):
         logging.info("got message %r", message)
         parsed = tornado.escape.json_decode(message)
 
-        # Check for which request was made
-
+        # Check for which request was made , bad code - maybe replace with switch-case
         get_params = parsed[0]["get_params"]
         params = None
         if get_params:
@@ -288,6 +321,38 @@ class ClassifierSocketHandler(tornado.websocket.WebSocketHandler):
         if set_params:
             params = parsed[0]["params"]
             Model.setParams(parsed[0]["classifier"],params)
+
+        train = parsed[0]["train"]
+        if train:
+            classifierName = parsed[0]["classifier"]
+            splits = parsed[0]["splits"]
+            classifier = Model.models[classifierName]
+            X = Model.trainingSet["X"]
+            y = Model.trainingSet["y"]
+            cv = Model.getCV(splits) # Get splits
+
+            logging.info("Starting Crossvalidation with %d splits", splits)
+
+            start = time.time()
+            # Just to know what we are dealing with here
+            def scorer(classifier, X, y):
+                return classifier.score(X, y)
+
+            scores = cross_val_score(classifier, X, y, cv=cv, scoring=scorer)
+            runtime = time.time() - start
+
+            logging.info('cv-accuracy for {}: {} +- {} and {} seconds'.format(classifierName, scores.mean(), scores.std(), runtime))
+            d = {}
+            d["name"] = classifierName
+            d["time"] = "{0:.5f}".format(runtime)
+            d["score"] = "{0:.3f}".format(scores.mean())
+            d["std"] = "+-{0:.5f}".format(scores.std())
+            d["params"] = Model.getParams(classifierName)
+            d["splits"] = splits
+            json_cv_time = d
+            logging.info(d)
+            ClassifierSocketHandler.send_updates(json_cv_time)
+
 
         # chat = {
         #    "id": str(uuid.uuid4()),

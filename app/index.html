@@ -123,8 +123,8 @@ David Dao, Broad Institute
                         <section data-route="model-validation">
                             <paper-material elevation="1">
                                 <h2 class="page-title"><span>Model Validation</span></h2>
-                                <bio-data-http id="bio-data-send" csv-data="{{csvData}}" response="{{response}}"></bio-data-http>
-                                <bio-websocket></bio-websocket>
+                                <bio-data-http id="bio-data-http" csv-data="{{csvData}}" response="{{response}}"></bio-data-http>
+                                <bio-websocket id="socket" classifiers="{{classifiers}}"></bio-websocket>
                                 <!-- <p id="submit-page">
                                     <paper-button raised onclick="sendRequest()">Submit Data
                                     </paper-button>
@@ -133,6 +133,7 @@ David Dao, Broad Institute
                                     <br>
                                 </p> -->
                             </paper-material>
+                            
                         </section>
                         <section data-route="user-info">
                             <paper-material elevation="1">

@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         </style>
         <!-- ajax call to our csv file -->
-        <iron-ajax id="ironPost" url="{{url}}" method="POST" params="{{params}}" content-type="application/json" body="{{body}}" handle-as="json" last-response="{{response}}"></iron-ajax>
+        <iron-ajax id="ironPost" url="{{url}}" method="POST" params="{{params}}" content-type="application/json" body="{{body}}" handle-as="json" on-response="sendEvent"></iron-ajax>
         <paper-button raised on-click="triggerRequest">Send Data to Server</paper-button>
         <iron-icon icon="done-all" id="done" style="visibility:hidden"></iron-icon>
         <p>
@@ -47,11 +47,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 csvData: {
                     type: String,
                     notify: true
-                },
-                response: {
-                    type: Object,
-                    notify: true,
-                    observer: 'sendEvent'
                 },
                 body: {
                     type: Object,

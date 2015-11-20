@@ -39,6 +39,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             height: 500px;
             overflow: auto;
         }
+        
+        paper-progress {
+            width: 500px;
+            margin: 20px 0;
+            --paper-progress-active-color: var(--paper-light-green-500);
+            --paper-progress-secondary-color: var(--paper-light-green-100);
+        }
         </style>
         <p>
             <h3>Select Classifier</h3>
@@ -62,11 +69,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </p>
         <p>
             <h4>Cross Validation Splits</h4>
-            <paper-slider min="1" max="20" value="5" editable id="selectedSplits"></paper-slider>
+            <paper-slider min="2" max="20" value="5" editable id="selectedSplits"></paper-slider>
         </p>
         <paper-button raised on-click="sendRequest">Train Classifier
         </paper-button>
         <paper-button raised on-click="getParams" data-dialog="modal">Edit Parameters</paper-button>
+        <br>
+        <p>
+            <div id="results"></div>
+        </p>
+
         <paper-dialog id="modal" modal style="height:700px">
             <h2>Edit Hyperparameters</h2>
             <p>
@@ -87,7 +99,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             properties: {
                 url: {
                     type: String,
-                    value: "ws://localhost:8002/classifiersocket"
+                    value: "ws://localhost:8002/classifiersocket",
+                    notify: true
                 },
                 updater: {
                     type: Object,
@@ -103,20 +116,46 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             }
                         };
                         return updater
-                    }
+                    },
+                    notify: true
+                },
+                classifiers: {
+                    type: Array,
+                    value: [],
+                    notify: true
                 }
             },
             ready: function() {
                 this.updater.start();
                 var container = this.$.jsonEditor;
-
                 this.editor = new JSONEditor(container);
             },
             sendRequest: function(event) {
                 var json = this.generateJson(); // Create a JSON File send to the server
+                json[0]["train"] = true;
                 var string = JSON.stringify(json);
                 console.log(string)
                 this.updater.socket.send(string);
+                var that = this;
+                this.updater.socket.onmessage = function(event) {
+                    var result = JSON.parse(event.data);
+                    that.classifiers.push(result);
+                    console.log(that.classifiers);
+                    var html = "";
+
+                    for (var i = 0; i < that.classifiers.length; i++) {
+                        html += "<paper-radio-button><h4>" + that.classifiers[i].name + "</h4>Accuracy: " + that.classifiers[i].score + 
+                        "<br>Std: " + that.classifiers[i].std + "<br>Time:" + " " + that.classifiers[i].time +
+                        " s  <br>CV Splits: " + that.classifiers[i].splits + "</paper-radio-button><paper-button raised>download model</paper-button><br>"
+                    }
+                    that.$.results.innerHTML = html;
+
+                    // that.notifyPath('classifier.name', that.classifier.name)
+                    // that.notifyPath('classifier.score', that.classifier.score)
+                    // that.notifyPath('classifier.std', that.classifier.std)
+                    // that.notifyPath('classifier.time', that.classifier.time)
+
+                }
             },
             generateJson: function() {
                 // Get the seletected Classifier Name
